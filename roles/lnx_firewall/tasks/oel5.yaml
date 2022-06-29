@@ -1,0 +1,24 @@
+---
+#
+# 
+# Author: Gabriel Torres – gabriel.torres@oracle.com  
+# Purpose: Disable Firewall in Linux machines 
+#         
+# Copyright (c) 2017, 2019, Oracle and/or its affiliates. All rights reserved.
+#
+
+# Linux 5 firewall service
+- name: Disable Firewall Linux 5
+  become: yes
+  service:
+   name: iptables
+   state: stopped
+   enabled: False
+
+- name: Stop Firewall Linux 5
+  become: yes
+  service:
+   name: ip6tables
+   state: stopped
+   enabled: False
+ 

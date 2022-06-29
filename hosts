@@ -1,0 +1,9 @@
+[LAB]
+#ttechpivot.eastus.cloudapp.azure.com ansible_connection=ssh
+vm-ccoe1.westus.cloudapp.azure.com ansible_connection=ssh ansible_user=testadmin ansible_ssh_pass=Password1234!
+vm-ccoe2.westus.cloudapp.azure.com ansible_connection=ssh ansible_user=testadmin ansible_ssh_pass=Password1234!
+ansible-lab.eastus.cloudapp.azure.com ansible_connection=ssh ansible_user=testadmin ansible_ssh_pass=Password1234!
+#[all:vars]
+#ansible_connection=ssh
+#ansible_user=testadmin
+#ansible_ssh_pass=Password1234!

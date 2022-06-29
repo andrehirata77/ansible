@@ -1,0 +1,62 @@
+- name: Wait for host to be reachable
+  wait_for_connection:
+    delay: 15
+    timeout: 300
+
+- name: Stop Firewall Linux 
+  become: yes
+  systemd: 
+    name: firewalld 
+    state: stopped
+ 
+- name: Disable Firewall Linux 
+  become: yes
+  systemd:
+    name: firewalld
+    enabled: no
+- name: httpd installed
+  become: yes
+  ansible.builtin.yum:
+    name: httpd
+    state: latest
+- name: custom index.html
+  become: yes
+  ansible.builtin.copy:
+    dest: /var/www/html/index.html
+    content: |
+      <img class="center" src="https://www.nozominetworks.com/wp-content/uploads/2021/08/telefonica-tech-logo.png">
+      <h1><center>Virtual Machine generated with Terraform - Git - Atlantis</center></h1>
+      <h1><center>Telefonica Tech - CCoE - Arquitetura e Engenharia</center></h1>
+      <h1><center>Servidor: {{ ansible_nodename }}</center></h1>
+      <h1><center>Custom Web Page Ansible</center></h1>
+- name: httpd service enabled
+  become: yes
+  ansible.builtin.service:
+    name: httpd
+    enabled: true
+    state: started
+- name: Add the user 
+  become: yes
+  ansible.builtin.user:
+    name: uansible
+    group: wheel
+    password: '$6$132rFqbpnxhby$9D.XCDcc01uPjem/VkMUYdb6txffCllkhuKXTKxeGNLk6DfgHMQ2VrCGxoWNkePdCjl57dl9AH5O2OD2ubI.2.'
+    createhome: yes     # Defaults to yes
+    home: /home/uansible    # Defaults to /home/<username>
+- name: Read variables for SSH Keys
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - "main.yaml"
+      paths: "../vars/"
+- name: Deploy SSH-Keys to remote host
+  become: yes
+  authorized_key:
+      user: uansible
+      key: "{{ keystodeploy|map(attribute='sshkey')|join('\n') }}"
+      exclusive: true
+# - name: Install updates
+#   become: yes
+#   ansible.builtin.yum:
+#     name: '*'
+#     state: latest

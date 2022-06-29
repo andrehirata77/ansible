@@ -1,0 +1,7 @@
+---
+
+- hosts: LAB
+  vars:
+    ansible_user: testadmin
+  roles:
+    - lnx_firewall

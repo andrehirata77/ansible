@@ -1,0 +1,112 @@
+---
+- name: The Cloud Bootcmap AWS - Mod01 - IAM with Ansible
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+  vars_files:
+    - creds.yml
+
+  tasks:
+  - name: Lendo o Arquivo CSV
+    community.general.read_csv:
+      path: usuarios.csv
+    delegate_to: localhost
+    register: userlist
+  
+  - name: Listar Arquivo CSV
+    ansible.builtin.debug:
+      msg: "{{ userlist.list }}"
+  
+  #- name: Lista Nome Usuarios
+  #  ansible.builtin.debug:
+  #    msg: "{{ item.usuarios }}"
+  #  loop: "{{ userlist.list }}"
+  
+  - name: Criando usuários
+    community.aws.iam_user:
+      name: "{{ item.usuarios }}"
+      password: "{{ item.senha }}"
+      password_reset_required: true
+      update_password : on_create
+      state: present
+    loop: "{{ userlist.list }}"
+
+  - name: Adiciona usuarios nos grupos
+    community.aws.iam_group:
+       name: "{{ item.grupo }}"
+       users: "{{ item.usuarios }}"
+       state: present
+    loop: "{{ userlist.list }}"
+                                 
+  #- name: Cria Grupos
+  #  community.aws.iam_group:
+  #    name: "{{ item.grupo }}"
+  #    state: present
+  #  loop: "{{ userlist.list }}"
+
+  - name: Aplicar Politica ao Grupo CloudAdmin
+    community.aws.iam_group:
+      name: "{{ item.grupo }}"
+      managed_policies:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+        - arn:aws:iam::aws:policy/IAMUserChangePassword
+      users: "{{ item.usuarios }}"
+      state: present
+    loop: "{{ userlist.list }}"
+    when: item.grupo == "CloudAdmin.ansible"
+  
+  - name: Aplicar Politica ao Grupo LinuxAdmin
+    community.aws.iam_group:
+      name: "{{ item.grupo }}"
+      managed_policies:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/IAMUserChangePassword
+      users: "{{ item.usuarios }}"
+      state: present
+    loop: "{{ userlist.list }}"
+    when: item.grupo == "LinuxAdmin.ansible"
+  
+  - name: Aplicar Politica ao Grupo RedesAdmin
+    community.aws.iam_group:
+      name: "{{ item.grupo }}"
+      managed_policies:
+        - arn:aws:iam::aws:policy/AmazonVPCFullAccess
+        - arn:aws:iam::aws:policy/IAMUserChangePassword
+      users: "{{ item.usuarios }}"
+      state: present
+    loop: "{{ userlist.list }}"
+    when: item.grupo == "RedesAdmin.ansible"
+
+  - name: Aplicar Politica ao Grupo DBA
+    community.aws.iam_group:
+      name: "{{ item.grupo }}"
+      managed_policies:
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/IAMUserChangePassword
+      users: "{{ item.usuarios }}"
+      state: present
+    loop: "{{ userlist.list }}"
+    when: item.grupo == "DBA.ansible"
+
+  - name: Aplicar Politica ao Grupo Estagiarios
+    community.aws.iam_group:
+      name: "{{ item.grupo }}"
+      managed_policies:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+        - arn:aws:iam::aws:policy/IAMUserChangePassword
+      users: "{{ item.usuarios }}"
+      state: present
+    loop: "{{ userlist.list }}"
+    when: item.grupo == "Estagiarios.ansible"
+
+  - name: Aplicar Politica de MFA
+    community.aws.iam_policy:
+      iam_type: group
+      iam_name: "{{ item.grupo }}"
+      policy_name: "EnforceMFAPolicy"
+      policy_document: "force_mfapolicy.txt"
+      state: present
+    loop: "{{ userlist.list }}"

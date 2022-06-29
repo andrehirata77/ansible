@@ -1,0 +1,32 @@
+---
+#
+# 
+# Author: Gabriel Torres – gabriel.torres@oracle.com  
+# Purpose: Disable Firewall in Linux machines 
+#         
+# Copyright (c) 2017, 2019, Oracle and/or its affiliates. All rights reserved.
+#
+
+ 
+#- include: tasks/pre_exec.yaml
+
+- name: Tasks for Oracle Linux 5
+  include_tasks: tasks/oel5.yaml
+  when: (ansible_facts['distribution'] == "OracleLinux" and ansible_facts['distribution_major_version'] == "5") 
+
+- name: Tasks for Oracle Linux 6
+  include_tasks: tasks/oel6.yaml
+  when: (ansible_facts['distribution'] == "OracleLinux" and ansible_facts['distribution_major_version'] == "6") 
+
+- name: Tasks for Oracle Linux 7
+  include_tasks: tasks/oel7.yaml
+  when: (ansible_facts['distribution'] == "OracleLinux" and ansible_facts['distribution_major_version'] == "7") 
+
+- name: Tasks for Centos
+  include_tasks: tasks/centos.yaml
+  when: ansible_distribution == 'CentOS'
+
+- name: Tasks for Ubuntu
+  include_tasks: tasks/ubuntu.yaml
+  when: ansible_distribution == 'Ubuntu'
+#- include: tasks/post_exec.yaml
