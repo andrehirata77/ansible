@@ -40,5 +40,5 @@
            <h1><center>Servidor: {{ ansible_nodename }}</center></h1
 
 
-- name: Start httpd service after reboot instance ec2
+- name: Start httpd service after reboot ec2 instance
   ansible.builtin.shell: sudo systemctl enable httpd
