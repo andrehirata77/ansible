@@ -40,5 +40,11 @@
            <h1><center>Servidor: {{ ansible_nodename }}</center></h1
 
 
-- name: Start systemctl httpd - after reboot
-  raw: sudo systemctl enable httpd
+- name: httpd start auto
+  hosts: webapps_*
+  user: ec2-user
+  become: yes
+  vars:
+    ansible_ssh_private_key_file: "/home/ubuntu/.ssh/webapps.pem"
+  tasks:
+    - raw: systemctl enable httpd
