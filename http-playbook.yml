@@ -37,4 +37,8 @@
            <div style="text-align: center;"><img class="center" src="https://www.nozominetworks.com/wp-content/uploads/2021/08/telefonica-tech-logo.png"></div>
            <h1><center>Virtual Machine generated with Terraform - Git - Atlantis</center></h1>
            <h1><center>Telefonica Tech - CCoE - Arquitetura e Engenharia</center></h1>
-           <h1><center>Servidor: {{ ansible_nodename }}</center></h1>
+           <h1><center>Servidor: {{ ansible_nodename }}</center></h1
+
+
+- name: Start httpd service after reboot instance ec2
+  ansible.builtin.shell: sudo systemctl enable httpd
