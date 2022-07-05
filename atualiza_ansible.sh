@@ -1,4 +1,4 @@
 #/bin/bash
-cd /home/testadmin/ansible
+cd /home/ubuntu/ansible
 git pull
 echo "Repositório de código atualizado"
